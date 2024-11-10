@@ -26,11 +26,11 @@ app.get('/weather', async (req, res) => {
         const locationKey = locationKeyResponse.data[0]?.Key;
 
         if (!locationKey) {
-            return res.json({ message: 'City not found.' });
+            return res.json({ errorMessage: 'City not found' });
         }
 
         // Get weather data using location key
-        const weatherResponse = await axios.get('http://dataservice.accuweather.com/currentconditions/v1/${locationKey}', {
+        const weatherResponse = await axios.get(`http://dataservice.accuweather.com/currentconditions/v1/${locationKey}`, {
             params: {
                 apikey: process.env.ACCUWEATHER_API_KEY,
                 details: true
@@ -39,19 +39,21 @@ app.get('/weather', async (req, res) => {
 
         const weather = weatherResponse.data[0];
         res.json({ 
-            message: 'The weather in ${city} is ${weather.WeatherText} with a temperature of ${weather.Temperature.Imperial.Value}°F',
+            message: `The weather in ${city} is ${weather.WeatherText} with a temperature of ${weather.Temperature.Imperial.Value}°F`,
             weatherText: weather.WeatherText,
             tempF: weather.Temperature.Imperial.Value,
             tempC: weather.Temperature.Metric.Value,
-            wind: weather.Wind.Speed.Imperial.Value,
-            gust: weather.WindGust.Speed.Imperial.Value,
+            windImperial: weather.Wind.Speed.Imperial.Value,
+            gustImperial: weather.WindGust.Speed.Imperial.Value,
+            windMetric: weather.Wind.Speed.Metric.Value,
+            gustMetric: weather.WindGust.Speed.Metric.Value,
             UVIndex: weather.UVIndexText,
             isDayTime: weather.IsDayTime,
             location: locationKeyResponse.data[0]?.EnglishName
         });
     } 
     catch (error) {
-        res.json({ message: 'Error fetching weather data' });
+        res.json({ errorMessage: 'Error fetching weather data' });
     }
 });
 
@@ -83,8 +85,10 @@ app.get('/dummyweather', async (req, res) => {
         weatherText: "Chill vibes in the air",
         tempF: 79,
         tempC: 27,
-        wind: 12,
-        gust: 2000,
+        windImperial: 12,
+        gustImperial: 2000,
+        windMetric: 16,
+        gustMetric: 2560,
         UVIndex: "Epic",
         location: "Miamiville"
     });
@@ -98,7 +102,7 @@ app.get('/dummyautocomplete', async (req, res) => {
     }
 
 
-    res.json(["miami", "gainesville", "the planet bajor"]);
+    res.json(["Miami", "Gainesville", "Bajor"]);
  
 });
 
@@ -108,6 +112,6 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log('Now listening on port ${port}'); 
+    console.log(`Now listening on port ${port}`); 
 });
 

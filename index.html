@@ -13,29 +13,36 @@
 <body class="flex flex-col space-y-12 bg-gradient-to-br from-yellow-200 to-orange-500 min-h-screen">
 
     <form id="weatherForm" autocomplete="off" class="mx-auto w-4/5 mt-20 flex flex-row space-x-3 justify-center">
+
         <label for="city" class="my-auto text-2xl text-white" style="font-family: 'Bebas Neue', sans-serif;">
           Enter City Name:
         </label>
+
         <div id="autocomplete" class="relative flex flex-col">
-            <input type="text" id="city" name="city" class="rounded-lg h-full px-2" required>
+            <input type="text" id="city" name="city" class="rounded-lg h-8 px-2" required>
+            <span id="errorMessage" class="absolute mt-8 text-red-500"></span>
             <ul id="suggestions" class="absolute mt-12 bg-white divide-y rounded-lg"></ul>
         </div>
+
         <button type="submit" id="citySubmit" class="bg-blue-700 hover:bg-blue-400 rounded p-2 text-white" style="font-family: 'Roboto', sans-serif;">
           Get Weather
         </button>
+
         <div class="my-auto flex items-center space-x-2">
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="tempToggle" class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600">
-            </div>
-            <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
-          </label>
-          <span class="text-white">Temperature toggle</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="tempToggle" class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600">
+                </div>
+                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+            </label>
+            <span class="text-white">Toggle metric/imperial units</span>
         </div>
+
     </form>
 
 
     <div id="weatherResult" class="hidden flex flex-row p-8 space-x-4 bg-white w-2/5 mx-auto rounded-lg">
+
         <div class="flex flex-col space-y-2 w-3/5">
             <span id="location" class="text-2xl"></span>
             <div class="flex flex-row space-x-2 items-center">
@@ -44,6 +51,7 @@
                 <span id="temperatureResult" class="text-4xl text-end"></span>
             </div>
         </div>
+
         <div class="flex flex-col space-y-2 pl-2 w-full divide-y">
             <div class="w-full flex flex-row justify-between">
                 <span>Conditions:</span> 
@@ -62,6 +70,7 @@
                 <span id="uvIndex" class="font-bold"></span>
             </div>
         </div>
+
     </div>
 
 
@@ -72,6 +81,8 @@
 
         let isChecked = checkbox.checked;
         let temperature = null;
+        let wind = null;
+        let gust = null;
         let data = null;
 
 
@@ -82,10 +93,10 @@
                 return;
             }
 
-            const response = await fetch('/dummyautocomplete?query=${encodeURIComponent(query)}');
+            const response = await fetch(`/autocomplete?query=${encodeURIComponent(query)}`);
             const suggestions = await response.json();
 
-            suggestionsList.innerHTML = suggestions.map(s => '<li data-key="${s.Key}" class="p-2 hover:bg-gray-300 cursor-pointer">${s.LocalizedName}, ${s.Country.LocalizedName}</li>').join('');
+            if(suggestions.length > 0 ) suggestionsList.innerHTML = suggestions.map(s => `<li data-key="${s.Key}" class="p-2 hover:bg-gray-300 cursor-pointer">${s.LocalizedName}, ${s.Country.LocalizedName}</li>`).join('');
 
             suggestionsList.addEventListener('click', (event) => {
                 if (event.target.tagName === 'LI') {
@@ -102,12 +113,18 @@
             isChecked = checkbox.checked;
             console.log('Checkbox is checked:', isChecked);
 
-            if(temperature)
-            {
-                temperature = isChecked ? data.tempC + " °C" : data.tempF + " °F";
-
-                document.getElementById('temperatureResult').innerText = temperature;
+            if(temperature) {
+                document.getElementById('temperatureResult').innerText = isChecked ? data.tempC + " °C" : data.tempF + " °F";
             }
+
+            if(wind) {
+                document.getElementById('wind').innerText = isChecked ? data.windMetric + " KM/H" : data.windImperial + " MPH";
+            }
+            
+            if(gust) {
+                document.getElementById('gust').innerText = isChecked ? data.gustMetric + " KM/H" : data.gustImperial + " MPH";
+            }
+           
         });
 
         document.getElementById('weatherForm').addEventListener('submit', async function (event) {
@@ -115,23 +132,29 @@
 
             suggestionsList.innerHTML = '';
 
-
             const city = document.getElementById('city').value;
-            const response = await fetch('/dummyweather?city=${encodeURIComponent(city)}');
+            const response = await fetch(`/weather?city=${encodeURIComponent(city)}`);
             data = await response.json();
+
+            if(data.errorMessage) {
+                document.getElementById('errorMessage').innerText = data.errorMessage;
+                return;
+            }
 
             if(data.weatherText.length) document.getElementById('weatherResult').classList.remove('hidden');
 
             setDayIcon();
 
+            temperature = isChecked ? data.tempC + " °C" : data.tempF + " °F";
+            wind = isChecked ? data.windMetric + " KM/H" : data.windImperial + " MPH";
+            gust = isChecked ? data.gustMetric + " KM/H" : data.gustImperial + " MPH";
+            
             document.getElementById('weatherText').innerText = data.weatherText;
-            document.getElementById('wind').innerText = data.wind + " MPH";
-            document.getElementById('gust').innerText = data.gust + " MPH";
             document.getElementById('uvIndex').innerText = data.UVIndex;
             document.getElementById('location').innerText = data.location;
-
-            temperature = isChecked ? data.tempC + " °C" : data.tempF + " °F";
             document.getElementById('temperatureResult').innerText = temperature;
+            document.getElementById('wind').innerText = wind;
+            document.getElementById('gust').innerText = gust;
         });
 
         function setDayIcon() {

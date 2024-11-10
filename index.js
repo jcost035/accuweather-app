@@ -70,7 +70,8 @@ app.get('/autocomplete', async (req, res) => {
         });
 
         res.json(response.data);
-    } catch (error) {
+    } 
+    catch (error) {
         res.json([]);
     }
 });
@@ -88,6 +89,17 @@ app.get('/dummyweather', async (req, res) => {
         location: "Miamiville"
     });
 
+});
+
+app.get('/dummyautocomplete', async (req, res) => {
+    const query = req.query.query;
+    if (!query) {
+        return res.json([]);
+    }
+
+
+    res.json(["miami", "gainesville", "the planet bajor"]);
+ 
 });
 
 app.get('/', (req, res) => {

@@ -12,15 +12,15 @@
 
 <body class="flex flex-col space-y-12 bg-gradient-to-br from-yellow-200 to-orange-500 min-h-screen">
 
-    <form id="weatherForm" class="mx-auto w-4/5 mt-20 flex flex-row space-x-3 justify-center">
+    <form id="weatherForm" autocomplete="off" class="mx-auto w-4/5 mt-20 flex flex-row space-x-3 justify-center">
         <label for="city" class="my-auto text-2xl text-white" style="font-family: 'Bebas Neue', sans-serif;">
           Enter City Name:
         </label>
         <div id="autocomplete" class="relative flex flex-col">
-            <input type="text" id="city" name="city" class="rounded-lg px-2" required>
-            <ul id="suggestions" class="absolute mt-8"></ul>
+            <input type="text" id="city" name="city" class="rounded-lg h-full px-2" required>
+            <ul id="suggestions" class="absolute mt-12 bg-white divide-y rounded-lg"></ul>
         </div>
-        <button type="submit" class="bg-blue-700 hover:bg-blue-400 rounded p-2 text-white" style="font-family: 'Roboto', sans-serif;">
+        <button type="submit" id="citySubmit" class="bg-blue-700 hover:bg-blue-400 rounded p-2 text-white" style="font-family: 'Roboto', sans-serif;">
           Get Weather
         </button>
         <div class="my-auto flex items-center space-x-2">
@@ -82,16 +82,18 @@
                 return;
             }
 
-            const response = await fetch(`/autocomplete?query=${encodeURIComponent(query)}`);
+            const response = await fetch('/dummyautocomplete?query=${encodeURIComponent(query)}');
             const suggestions = await response.json();
 
-            suggestionsList.innerHTML = suggestions.map(s => `<li data-key="${s.Key}">${s.LocalizedName}, ${s.Country.LocalizedName}</li>`).join('');
+            suggestionsList.innerHTML = suggestions.map(s => '<li data-key="${s.Key}" class="p-2 hover:bg-gray-300 cursor-pointer">${s.LocalizedName}, ${s.Country.LocalizedName}</li>').join('');
 
             suggestionsList.addEventListener('click', (event) => {
                 if (event.target.tagName === 'LI') {
                     cityInput.value = event.target.textContent;
                     cityInput.dataset.key = event.target.getAttribute('data-key');
                     suggestionsList.innerHTML = '';
+
+                    document.getElementById('citySubmit').click();
                 }
             });
         });
@@ -111,8 +113,11 @@
         document.getElementById('weatherForm').addEventListener('submit', async function (event) {
             event.preventDefault();
 
+            suggestionsList.innerHTML = '';
+
+
             const city = document.getElementById('city').value;
-            const response = await fetch(`/dummyweather?city=${encodeURIComponent(city)}`);
+            const response = await fetch('/dummyweather?city=${encodeURIComponent(city)}');
             data = await response.json();
 
             if(data.weatherText.length) document.getElementById('weatherResult').classList.remove('hidden');

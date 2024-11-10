@@ -15,7 +15,6 @@ app.get('/weather', async (req, res) => {
     }
 
     try {
-        // Get location key from API
         const locationKeyResponse = await axios.get('http://dataservice.accuweather.com/locations/v1/cities/search', {
             params: {
                 apikey: process.env.ACCUWEATHER_API_KEY,
@@ -29,7 +28,6 @@ app.get('/weather', async (req, res) => {
             return res.json({ errorMessage: 'City not found' });
         }
 
-        // Get weather data using location key
         const weatherResponse = await axios.get(`http://dataservice.accuweather.com/currentconditions/v1/${locationKey}`, {
             params: {
                 apikey: process.env.ACCUWEATHER_API_KEY,

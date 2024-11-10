@@ -16,7 +16,7 @@ app.get('/weather', async (req, res) => {
 
     try {
         // Get location key from API
-        const locationKeyResponse = await axios.get(`http://dataservice.accuweather.com/locations/v1/cities/search`, {
+        const locationKeyResponse = await axios.get('http://dataservice.accuweather.com/locations/v1/cities/search', {
             params: {
                 apikey: process.env.ACCUWEATHER_API_KEY,
                 q: city
@@ -30,7 +30,7 @@ app.get('/weather', async (req, res) => {
         }
 
         // Get weather data using location key
-        const weatherResponse = await axios.get(`http://dataservice.accuweather.com/currentconditions/v1/${locationKey}`, {
+        const weatherResponse = await axios.get('http://dataservice.accuweather.com/currentconditions/v1/${locationKey}', {
             params: {
                 apikey: process.env.ACCUWEATHER_API_KEY,
                 details: true
@@ -39,7 +39,7 @@ app.get('/weather', async (req, res) => {
 
         const weather = weatherResponse.data[0];
         res.json({ 
-            message: `The weather in ${city} is ${weather.WeatherText} with a temperature of ${weather.Temperature.Imperial.Value}°F`,
+            message: 'The weather in ${city} is ${weather.WeatherText} with a temperature of ${weather.Temperature.Imperial.Value}°F',
             weatherText: weather.WeatherText,
             tempF: weather.Temperature.Imperial.Value,
             tempC: weather.Temperature.Metric.Value,
@@ -55,10 +55,30 @@ app.get('/weather', async (req, res) => {
     }
 });
 
+app.get('/autocomplete', async (req, res) => {
+    const query = req.query.query;
+    if (!query) {
+        return res.json([]);
+    }
+
+    try {
+        const response = await axios.get('http://dataservice.accuweather.com/locations/v1/cities/autocomplete', {
+            params: {
+                apikey: process.env.ACCUWEATHER_API_KEY,
+                q: query
+            }
+        });
+
+        res.json(response.data);
+    } catch (error) {
+        res.json([]);
+    }
+});
+
 app.get('/dummyweather', async (req, res) => {
 
     res.json({ 
-        message: `The weather in city is vibes`,
+        message: 'The weather in city is vibes',
         weatherText: "Chill vibes in the air",
         tempF: 79,
         tempC: 27,
@@ -76,6 +96,6 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Now listening on port ${port}`); 
+    console.log('Now listening on port ${port}'); 
 });
 

@@ -16,7 +16,10 @@
         <label for="city" class="my-auto text-2xl text-white" style="font-family: 'Bebas Neue', sans-serif;">
           Enter City Name:
         </label>
-        <input type="text" id="city" name="city" class="w-1/3 rounded-lg px-2" required>
+        <div id="autocomplete" class="relative flex flex-col">
+            <input type="text" id="city" name="city" class="rounded-lg px-2" required>
+            <ul id="suggestions" class="absolute mt-8"></ul>
+        </div>
         <button type="submit" class="bg-blue-700 hover:bg-blue-400 rounded p-2 text-white" style="font-family: 'Roboto', sans-serif;">
           Get Weather
         </button>
@@ -64,10 +67,34 @@
 
     <script>
         const checkbox = document.getElementById('tempToggle');
+        const cityInput = document.getElementById('city');
+        const suggestionsList = document.getElementById('suggestions');
 
         let isChecked = checkbox.checked;
         let temperature = null;
         let data = null;
+
+
+        cityInput.addEventListener('input', async () => {
+            const query = cityInput.value;
+            if (query.length < 2) {
+                suggestionsList.innerHTML = '';
+                return;
+            }
+
+            const response = await fetch(`/autocomplete?query=${encodeURIComponent(query)}`);
+            const suggestions = await response.json();
+
+            suggestionsList.innerHTML = suggestions.map(s => `<li data-key="${s.Key}">${s.LocalizedName}, ${s.Country.LocalizedName}</li>`).join('');
+
+            suggestionsList.addEventListener('click', (event) => {
+                if (event.target.tagName === 'LI') {
+                    cityInput.value = event.target.textContent;
+                    cityInput.dataset.key = event.target.getAttribute('data-key');
+                    suggestionsList.innerHTML = '';
+                }
+            });
+        });
 
         checkbox.addEventListener('change', function() {
             isChecked = checkbox.checked;

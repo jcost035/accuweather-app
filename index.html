@@ -86,76 +86,13 @@
         let data = null;
 
 
-        cityInput.addEventListener('input', async () => {
-            const query = cityInput.value;
-            if (query.length < 2) {
-                suggestionsList.innerHTML = '';
-                return;
-            }
+        cityInput.addEventListener('input', autocompleteCityInput);
 
-            const response = await fetch(`/autocomplete?query=${encodeURIComponent(query)}`);
-            const suggestions = await response.json();
+        suggestionsList.addEventListener('click', handleAutocompleteSelection);
+        
+        checkbox.addEventListener('change', handleUnitToggle);
 
-            if(suggestions.length > 0 ) suggestionsList.innerHTML = suggestions.map(s => `<li data-key="${s.Key}" class="p-2 hover:bg-gray-300 cursor-pointer">${s.LocalizedName}, ${s.Country.LocalizedName}</li>`).join('');
-
-            suggestionsList.addEventListener('click', (event) => {
-                if (event.target.tagName === 'LI') {
-                    cityInput.value = event.target.textContent;
-                    cityInput.dataset.key = event.target.getAttribute('data-key');
-                    suggestionsList.innerHTML = '';
-
-                    document.getElementById('citySubmit').click();
-                }
-            });
-        });
-
-        checkbox.addEventListener('change', function() {
-            isChecked = checkbox.checked;
-            console.log('Checkbox is checked:', isChecked);
-
-            if(temperature) {
-                document.getElementById('temperatureResult').innerText = isChecked ? data.tempC + " °C" : data.tempF + " °F";
-            }
-
-            if(wind) {
-                document.getElementById('wind').innerText = isChecked ? data.windMetric + " KM/H" : data.windImperial + " MPH";
-            }
-            
-            if(gust) {
-                document.getElementById('gust').innerText = isChecked ? data.gustMetric + " KM/H" : data.gustImperial + " MPH";
-            }
-           
-        });
-
-        document.getElementById('weatherForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
-
-            suggestionsList.innerHTML = '';
-
-            const city = document.getElementById('city').value;
-            const response = await fetch(`/weather?city=${encodeURIComponent(city)}`);
-            data = await response.json();
-
-            if(data.errorMessage) {
-                document.getElementById('errorMessage').innerText = data.errorMessage;
-                return;
-            }
-
-            if(data.weatherText.length) document.getElementById('weatherResult').classList.remove('hidden');
-
-            setDayIcon();
-
-            temperature = isChecked ? data.tempC + " °C" : data.tempF + " °F";
-            wind = isChecked ? data.windMetric + " KM/H" : data.windImperial + " MPH";
-            gust = isChecked ? data.gustMetric + " KM/H" : data.gustImperial + " MPH";
-            
-            document.getElementById('weatherText').innerText = data.weatherText;
-            document.getElementById('uvIndex').innerText = data.UVIndex;
-            document.getElementById('location').innerText = data.location;
-            document.getElementById('temperatureResult').innerText = temperature;
-            document.getElementById('wind').innerText = wind;
-            document.getElementById('gust').innerText = gust;
-        });
+        document.getElementById('weatherForm').addEventListener('submit', getWeatherResults);
 
         function setDayIcon() {
             let sun = document.getElementById('sun');
@@ -168,6 +105,73 @@
                 moon.classList.remove('hidden');
                 sun.classList.add('hidden')
             }
+        }
+
+        async function autocompleteCityInput() {
+            const query = cityInput.value;
+            if (query.length < 2) {
+                suggestionsList.innerHTML = '';
+                return;
+            }
+
+            const response = await fetch(`/dummyautocomplete?query=${encodeURIComponent(query)}`);
+            const suggestions = await response.json();
+
+            if(suggestions.length > 0 ) suggestionsList.innerHTML = suggestions.map(s => `<li data-key="${s.Key}" class="p-2 hover:bg-gray-300 cursor-pointer">${s.LocalizedName}, ${s.Country.LocalizedName}</li>`).join('');
+        }
+
+        function handleAutocompleteSelection(event) {
+            if (event.target.tagName === 'LI') {
+                    cityInput.value = event.target.textContent;
+                    cityInput.dataset.key = event.target.getAttribute('data-key');
+                    suggestionsList.innerHTML = '';
+
+                    document.getElementById('citySubmit').click();
+                }
+        }
+
+        function handleUnitToggle() {
+            isChecked = checkbox.checked;
+            
+            if(!data) return;
+
+            document.getElementById('temperatureResult').innerText = isChecked ? data.tempC + " °C" : data.tempF + " °F";
+            document.getElementById('wind').innerText = isChecked ? data.windMetric + " KM/H" : data.windImperial + " MPH";
+            document.getElementById('gust').innerText = isChecked ? data.gustMetric + " KM/H" : data.gustImperial + " MPH";
+        }
+
+        async function getWeatherResults() {
+            event.preventDefault();
+
+            suggestionsList.innerHTML = '';
+
+            const city = document.getElementById('city').value;
+            const response = await fetch(`/dummyweather?city=${encodeURIComponent(city)}`);
+            data = await response.json();
+
+            if(data.errorMessage) {
+                document.getElementById('errorMessage').innerText = data.errorMessage;
+                return;
+            }
+
+            if(data.weatherText.length) document.getElementById('weatherResult').classList.remove('hidden');
+
+            setDayIcon();
+
+            populateWeatherResults();
+        }
+
+        function populateWeatherResults() {
+            temperature = isChecked ? data.tempC + " °C" : data.tempF + " °F";
+            wind = isChecked ? data.windMetric + " KM/H" : data.windImperial + " MPH";
+            gust = isChecked ? data.gustMetric + " KM/H" : data.gustImperial + " MPH";
+            
+            document.getElementById('weatherText').innerText = data.weatherText;
+            document.getElementById('uvIndex').innerText = data.UVIndex;
+            document.getElementById('location').innerText = data.location;
+            document.getElementById('temperatureResult').innerText = temperature;
+            document.getElementById('wind').innerText = wind;
+            document.getElementById('gust').innerText = gust;
         }
     </script>
 </body>

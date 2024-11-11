@@ -1,21 +1,13 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2706
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+Accuweather API Project
 
-\f0\fs24 \cf0 Accuweather Project\
-\
-Prerequisites: Node.js and npm\
-\
-Instructions\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 --------------------\
-1. Clone the repo\
-\
-2. Once the repo is closed, navigate to the accuweather-app  directoryand run \'91npm install\'92 to install all the required packages\
-\
-3.  From the same directory, run \'91npm start\'92 to start the program on port 3000\
-\
-4. In the browser navigate to localhost:3000 to start using the application}
+Prerequisites: Node.js and npm
+
+Instructions
+--------------------
+1. Clone the repo
+
+2. Once the repo is closed, navigate to the accuweather-app  directoryand run 'npm install' to install all the required packages
+
+3.  From the same directory, run 'npm start' to start the program on port 3000
+
+4. In the browser navigate to localhost:3000 to start using the application

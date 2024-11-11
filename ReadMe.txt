@@ -1,13 +1,18 @@
 Accuweather API Project
 
-Prerequisites: Node.js and npm
+Prerequisites
 
-Instructions
---------------------
-1. Clone the repo
+    Node.js 
+    npm (included with Node.js)
 
-2. Once the repo is closed, navigate to the accuweather-app  directoryand run 'npm install' to install all the required packages
+Setup Instructions
 
-3.  From the same directory, run 'npm start' to start the program on port 3000
+    1. Clone the repository to your local machine.
 
-4. In the browser navigate to localhost:3000 to start using the application
+    2. Navigate to the project directory called accuweather-app.
+
+    3. Install all required dependencies by running npm install.
+
+    4. Start the application by running npm start.
+
+    5. Open your browser and go to http://localhost:3000 to access the application.

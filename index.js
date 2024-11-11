@@ -11,7 +11,7 @@ app.get('/weather', async (req, res) => {
     
     const city = req.query.city;
     if (!city) {
-        return res.json({ message: 'Please provide a city name.' });
+        return res.json({ message: 'Please provide a city name' });
     }
 
     try {
@@ -99,7 +99,11 @@ app.get('/dummyautocomplete', async (req, res) => {
     }
 
 
-    res.json(["Miami", "Gainesville", "Bajor"]);
+    res.json([
+        {LocalizedName: "Miami", Country: {LocalizedName: "Florida"}}, 
+        {LocalizedName: "Gainesville", Country: {LocalizedName: "Florida"}}, 
+        {LocalizedName: "Bajor", Country: {LocalizedName: "Space"}}
+    ]);
  
 });
 

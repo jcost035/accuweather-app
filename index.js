@@ -37,7 +37,6 @@ app.get('/weather', async (req, res) => {
 
         const weather = weatherResponse.data[0];
         res.json({ 
-            message: `The weather in ${city} is ${weather.WeatherText} with a temperature of ${weather.Temperature.Imperial.Value}°F`,
             weatherText: weather.WeatherText,
             tempF: weather.Temperature.Imperial.Value,
             tempC: weather.Temperature.Metric.Value,
